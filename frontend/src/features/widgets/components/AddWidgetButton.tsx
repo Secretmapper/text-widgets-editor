@@ -23,6 +23,7 @@ export const AddWidgetButton: React.FC<AddWidgetButtonProps> = ({
         onClick={handleClick}
         disabled={disabled}
         className="
+          cursor-pointer
           p-2 rounded-full
           text-black border border-[#1a1a1a]
           hover:text-white hover:bg-[#1a1a1a]

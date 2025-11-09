@@ -65,7 +65,7 @@ export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({
             <span className="text-xs text-[#2c2c2c]">Are you sure?</span>
             <button
               onClick={handleConfirmDelete}
-              className="p-1 text-[#4a9c6d] hover:bg-[#4a9c6d] hover:text-white rounded transition-colors"
+              className="cursor-pointer p-1 text-[#4a9c6d] hover:bg-[#4a9c6d] hover:text-white rounded transition-colors"
               title="Confirm delete"
               type="button"
             >
@@ -73,7 +73,7 @@ export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({
             </button>
             <button
               onClick={handleCancelDelete}
-              className="p-1 text-[#d14343] hover:bg-[#d14343] hover:text-white rounded transition-colors"
+              className="cursor-pointer p-1 text-[#d14343] hover:bg-[#d14343] hover:text-white rounded transition-colors"
               title="Cancel"
               type="button"
             >
@@ -83,7 +83,7 @@ export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({
         ) : (
           <button
             onClick={handleDeleteClick}
-            className="p-1.5 text-[#999] hover:text-[#d14343] hover:bg-[#fef2f2] rounded transition-colors"
+            className="cursor-pointer p-1.5 text-[#999] hover:text-[#d14343] hover:bg-[#fef2f2] rounded transition-colors"
             title="Delete"
             type="button"
           >
