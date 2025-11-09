@@ -1,9 +1,7 @@
+import { HomePage } from './pages';
+
 function App() {
-  return (
-    <>
-      <h1>Text Widget App</h1>
-    </>
-  );
+  return <HomePage />;
 }
 
 export default App;
