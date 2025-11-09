@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('HomePage - E2E Tests', () => {
   test.beforeEach(async ({ page, request }) => {
     // Arrange: Clear the database before each test to ensure isolation
-    await request.post('http://localhost:4000/trpc/clearDatabase', {
+    await request.post('/trpc/clearDatabase', {
       data: {},
     });
 
@@ -12,21 +12,23 @@ test.describe('HomePage - E2E Tests', () => {
   });
 
   test('should show loading skeleton state on initial load', async ({ page }) => {
-    // Arrange: Navigate to the page without waiting for full load
-    await page.goto('/', { waitUntil: 'domcontentloaded' });
+    // Arrange: Intercept tRPC call and add delay
+    await page.route('**/trpc/**', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      await route.continue();
+    });
 
-    // Act: Check for skeleton or content (race condition due to fast loading)
-    const skeletons = page.locator('.animate-pulse');
-    const hasSkeletonOrContent = await Promise.race([
-      skeletons
-        .first()
-        .isVisible()
-        .catch(() => false),
-      page.getByRole('button', { name: /add text widget/i }).isVisible(),
-    ]);
+    // Act: Navigate to the page
+    await page.goto('/');
 
-    // Assert: Either skeleton was shown or content loaded
-    expect(hasSkeletonOrContent).toBeTruthy();
+    // Assert: Skeleton is visible during loading
+    await expect(page.locator('.animate-pulse').first()).toBeVisible();
+
+    // Assert: Content eventually loads and skeleton disappears
+    await expect(page.getByRole('button', { name: /add text widget/i })).toBeVisible({
+      timeout: 10000,
+    });
+    await expect(page.locator('.animate-pulse').first()).not.toBeVisible();
   });
 
   test('should render empty state with CTA button', async ({ page }) => {
@@ -118,13 +120,17 @@ test.describe('HomePage - E2E Tests', () => {
   });
 
   test('should handle widget deletion with confirmation', async ({ page }) => {
-    // Arrange: Add a widget with content and set up dialog handler
+    // Arrange: Add a widget
     await page.getByRole('button', { name: /add text widget/i }).click();
-    await page.getByRole('textbox').first().fill('To be deleted');
-    page.on('dialog', (dialog) => dialog.accept());
 
-    // Act: Click delete button
-    await page.getByRole('button', { name: /delete widget/i }).click();
+    // Act: Click delete button to show confirmation
+    await page.getByRole('button', { name: /delete/i }).click();
+
+    // Assert: Confirmation dialog appears
+    await expect(page.getByText('Are you sure?')).toBeVisible();
+
+    // Act: Confirm deletion
+    await page.getByRole('button', { name: /confirm delete/i }).click();
 
     // Assert: Widget is removed and empty state is shown
     await expect(page.getByRole('textbox')).not.toBeVisible();
