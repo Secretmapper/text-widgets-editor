@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run prettier on staged files
+npx prettier --write --ignore-unknown $(git diff --cached --name-only --diff-filter=ACMR)
+git update-index --again
