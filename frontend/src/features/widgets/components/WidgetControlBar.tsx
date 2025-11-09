@@ -1,12 +1,19 @@
 import { useState } from 'react';
-import { Trash2, X, Check } from 'lucide-react';
+import { Trash2, X, Check, Loader2, AlertCircle } from 'lucide-react';
 
 interface WidgetControlBarProps {
-  widgetId: string;
-  onDelete: (id: string) => void;
+  onRemove: () => void;
+  showSaved: boolean;
+  isSaveError: boolean;
+  isSavePending: boolean;
 }
 
-export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({ widgetId, onDelete }) => {
+export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({
+  onRemove,
+  showSaved,
+  isSaveError,
+  isSavePending,
+}) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDeleteClick = () => {
@@ -18,7 +25,7 @@ export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({ widgetId, on
   };
 
   const handleConfirmDelete = () => {
-    onDelete(widgetId);
+    onRemove();
     setShowDeleteConfirm(false);
   };
 
@@ -29,6 +36,30 @@ export const WidgetControlBar: React.FC<WidgetControlBarProps> = ({ widgetId, on
   return (
     <div className="flex justify-end items-center">
       <div className="flex gap-1 items-center">
+        {!showDeleteConfirm && (
+          <>
+            {/* Mutation state indicators */}
+            {isSavePending && (
+              <span className="flex items-center gap-1 text-xs text-[#6b6b6b] mr-2">
+                <Loader2 size={12} className="animate-spin" />
+                Saving...
+              </span>
+            )}
+            {showSaved && (
+              <span className="flex items-center gap-1 text-xs text-[#4a9c6d] mr-2">
+                <Check size={12} />
+                Saved
+              </span>
+            )}
+            {isSaveError && (
+              <span className="flex items-center gap-1 text-xs text-[#d14343] mr-2">
+                <AlertCircle size={12} />
+                Error
+              </span>
+            )}
+          </>
+        )}
+
         {showDeleteConfirm ? (
           <div className="flex items-center gap-2 px-2 py-1 bg-[#fef2f2] rounded-md">
             <span className="text-xs text-[#2c2c2c]">Are you sure?</span>

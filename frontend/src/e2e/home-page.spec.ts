@@ -10,6 +10,11 @@ test.describe('HomePage - E2E Tests', () => {
     // Arrange: Load Page
     await page.goto('/');
   });
+  test.afterAll(async ({ request }) => {
+    await request.post('/trpc/clearDatabase', {
+      data: {},
+    });
+  });
 
   test('should show loading skeleton state on initial load', async ({ page }) => {
     // Arrange: Intercept tRPC call and add delay
@@ -92,8 +97,7 @@ test.describe('HomePage - E2E Tests', () => {
     // Act: Type in the textarea to trigger auto-save
     const textarea = page.getByRole('textbox').first();
     await textarea.fill('Test');
-    await page.waitForTimeout(100); // Brief pause for pending state
-    await page.waitForTimeout(700); // Wait for auto-save (500ms debounce + network)
+    await page.waitForTimeout(1000);
 
     // Assert: "Saved" status indicator is visible
     const savedIndicator = page.getByText(/saved/i);
@@ -104,19 +108,24 @@ test.describe('HomePage - E2E Tests', () => {
     // Arrange: Add two widgets with different content
     await page.getByRole('button', { name: /add text widget/i }).click();
     await page.waitForTimeout(100);
-    await page.getByRole('button', { name: /add text widget/i }).click();
+    await page
+      .getByRole('button', { name: /add text widget/i })
+      .nth(1)
+      .click();
     await page.waitForTimeout(100);
     const textareas = page.getByRole('textbox');
     await textareas.nth(0).fill('First widget content');
     await textareas.nth(1).fill('Second widget content');
-    await page.waitForTimeout(600); // Wait for auto-save
+    await page.waitForTimeout(2000); // Wait for auto-save
 
     // Act: Reload the page
     await page.reload();
 
     // Assert: Both widgets have their correct content
-    await expect(textareas.nth(0)).toHaveValue('First widget content');
-    await expect(textareas.nth(1)).toHaveValue('Second widget content');
+    await expect(page.getByRole('textbox')).toHaveCount(2);
+
+    await expect(page.getByRole('textbox').nth(0)).toHaveValue('First widget content');
+    await expect(page.getByRole('textbox').nth(1)).toHaveValue('Second widget content');
   });
 
   test('should handle widget deletion with confirmation', async ({ page }) => {

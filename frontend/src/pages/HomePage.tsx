@@ -37,7 +37,7 @@ export function HomePage() {
             {widgets.list.length > 0 &&
               widgets.list.map((widgetListItem, index) => (
                 <div key={widgetListItem.id}>
-                  <RichWidget widgetId={widgetListItem.id} onDelete={widgets.remove} />
+                  <RichWidget widgetId={widgetListItem.id} />
 
                   <AddWidgetButton
                     position={index + 1}
